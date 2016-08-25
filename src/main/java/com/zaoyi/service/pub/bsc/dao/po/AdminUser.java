@@ -14,9 +14,6 @@ import com.zaoyi.service.core.PO;
 @Entity
 @Table
 public class AdminUser extends PO {
-	public static final Integer TYPE_ADMIN_SUPER=1;
-	public static final Integer TYPE_ADMIN_GENERAL=1;
-	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(unique=true,nullable=false)
@@ -24,10 +21,11 @@ public class AdminUser extends PO {
 	private String account;
 	private String name;
 	private String password;
-	private Integer type;
+	private Integer roleId;
 	private String department;
 	private String realname;
 	private Long dtCreat;
+	
 	
 	@Override
 	public Serializable getId() {
@@ -59,11 +57,11 @@ public class AdminUser extends PO {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	public Integer getType() {
-		return type;
+	public Integer getRoleId() {
+		return roleId;
 	}
-	public void setType(Integer type) {
-		this.type = type;
+	public void setRoleId(Integer roleId) {
+		this.roleId = roleId;
 	}
 	public String getDepartment() {
 		return department;

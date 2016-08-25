@@ -17,6 +17,7 @@
     <param-name>contextConfigLocation</param-name>
     <param-value>classpath:spring.cfg.xml</param-value>
   </context-param>
+  <!-- 编码过滤 -->
   <filter>
     <filter-name>encoding</filter-name>
     <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -32,6 +33,17 @@
   <filter-mapping>
     <filter-name>encoding</filter-name>
     <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+  <!-- 权限过滤 -->
+  <filter>
+    <filter-name>ViewProvinceFilter</filter-name>
+    <filter-class>com.zaoyi.service.web.filer.ViewPermissionFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>ViewProvinceFilter</filter-name>
+    <url-pattern>*.jsp</url-pattern>
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>

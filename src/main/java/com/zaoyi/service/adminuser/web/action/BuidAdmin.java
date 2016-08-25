@@ -18,7 +18,6 @@ public class BuidAdmin {
 			adminUser.setAccount("admin");
 			adminUser.setPassword("123");
 			adminUser.setDtCreat(System.currentTimeMillis());
-			adminUser.setType(AdminUser.TYPE_ADMIN_SUPER);
 			adminUser.setName("林江");
 			adminUser.setRealname("超级管理员");
 			adminUser.setDepartment("ceo");
