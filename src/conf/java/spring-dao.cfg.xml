@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p" xsi:schemaLocation="http://www.springframework.org/schema/beans          http://www.springframework.org/schema/beans/spring-beans.xsd           http://www.springframework.org/schema/context          http://www.springframework.org/schema/context/spring-context-4.2.xsd           http://www.springframework.org/schema/mvc          http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd           http://www.springframework.org/schema/aop          http://www.springframework.org/schema/aop/spring-aop-4.2.xsd           http://www.springframework.org/schema/tx          http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+	<!-- 读取jdbc配置文件 -->
+  <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="location" value="classpath:jdbc.properties"></property>
+  </bean>
+ <!--  <bean id="transactionManager"
+    class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource" />
+  </bean> -->
+  <bean id="dbcpBasicDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    <property name="driverClassName" value="${jdbc.driverClassName}"></property>
+    <property name="url" value="${jdbc.url}"></property>
+    <property name="username" value="${jdbc.username}"></property>
+    <property name="password" value="${jdbc.password}"></property>
+    <property name="maxActive">
+      <value>5</value>
+    </property>
+    <property name="initialSize">
+      <value>1</value>
+    </property>
+    <property name="maxWait">
+      <value>60000</value>
+    </property>
+    <property name="maxIdle">
+      <value>0</value>
+    </property>
+    <property name="minIdle">
+      <value>0</value>
+    </property>
+    <property name="removeAbandoned">
+      <value>true</value>
+    </property>
+    <property name="removeAbandonedTimeout">
+      <value>180</value>
+    </property>
+    <property name="poolPreparedStatements">
+      <value>true</value>
+    </property>
+    <property name="maxOpenPreparedStatements">
+      <value>10</value>
+    </property>
+    <property name="validationQuery">
+      <value>SELECT 1</value>
+    </property>
+    <property name="testOnBorrow">
+      <value>true</value>
+    </property>
+  </bean>
+  <bean id="localSessionFactoryBean" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+    <property name="dataSource" ref="dbcpBasicDataSource"></property>
+    <property name="packagesToScan" value="com.zaoyi.service.pub.bsc.dao.po"></property>
+    <property name="hibernateProperties">
+      <props>
+      	<!-- 设置数据库方言 -->
+        <prop key="hibernate.dialect">${jdbc.dialect}</prop>
+        <!-- 设置自动创建|更新|验证数据库表结构 -->
+       	<!-- <prop key="hibernate.hbm2ddl.auto">create</prop>  -->
+        <prop key="hibernate.hbm2ddl.auto">update</prop>
+        <!-- 数据库批量查询最大数 -->
+       	<prop key="hibernate.jdbc.fetch_size">100</prop>  
+       	<!-- 优化hibernate批量处理 -->
+       	<prop key="hibernate.jdbc.batch_size">100</prop>  
+		<prop key="hibernate.order_inserts">true</prop>  
+		<prop key="hibernate.order_updates">true</prop> 
+        <prop key="hibernate.show_sql">false</prop>
+        <prop key="generate_statistics">false</prop>
+        <prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+        <!-- 是否开启二级缓存 -->
+        <prop key="hibernate.cache.use_second_level_cache">false</prop>
+        <!-- 是否开启查询缓存 -->
+        <prop key="hibernate.cache.use_query_cache">false</prop>
+        <!-- 是否自动提交事务 -->
+        <!-- <prop key="hibernate.connection.autocommit">false</prop> -->
+        <!-- 指定hibernate在何时释放JDBC连接 -->
+        <!-- <prop key="hibernate.connection.release_mode">auto</prop> -->
+        <prop key="connection.autoReconnect">true</prop>
+        <prop key="connection.autoReconnectForPools">true</prop>
+        <prop key="connection.is-connection-validation-required">true</prop>
+      </props>
+    </property>
+  </bean>
+  <!-- 数据访问模板 -->
+  <bean id="hibernateTemplate" class="org.springframework.orm.hibernate4.HibernateTemplate">
+    <property name="sessionFactory" ref="localSessionFactoryBean"></property>
+  </bean>
+  <bean id="extraSpringHibernateTemplateImpl" class="com.zaoyi.service.common.util.ExtraSpringHibernateTemplateImpl">
+    <property name="hibernateTemplate" ref="hibernateTemplate"></property>
+  </bean>
+  <!-- 事务 -->
+  <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+    <property name="sessionFactory" ref="localSessionFactoryBean"></property>
+  </bean>
+  <tx:advice id="txAdvice" transaction-manager="transactionManager">
+    <tx:attributes>
+      <tx:method name="*" propagation="REQUIRED"></tx:method>
+    </tx:attributes>
+  </tx:advice>
+  <aop:config proxy-target-class="true">
+    <aop:pointcut id="hibernateTemplatePointcut" expression="execution(* org.springframework.orm.hibernate4.HibernateTemplate.*(..))"></aop:pointcut>
+    <aop:advisor advice-ref="txAdvice" pointcut-ref="hibernateTemplatePointcut"></aop:advisor>
+  </aop:config>
+</beans>

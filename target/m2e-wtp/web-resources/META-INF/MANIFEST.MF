@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Built-By: linjiang
+Build-Jdk: 1.7.0_07
+Implementation-Title: zaoyi-serivce Maven Webapp
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: zaoyi-serivce
+Created-By: Maven Integration for Eclipse
+
